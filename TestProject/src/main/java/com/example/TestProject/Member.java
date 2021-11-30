@@ -1,25 +1,36 @@
 package com.example.TestProject;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Data
+@Getter
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Table(name="tbmember")
 public class Member {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	public int mem_no;
+	@Column(name = "mem_no")
+	public int no;
 	
-	public String mem_id;
-	public String mem_pw;
+	@Column(name="mem_id")
+	public String id;
+	
+	@Column(name="mem_pw")
+	public String pw;
 
 }
