@@ -1,8 +1,11 @@
 package com.example.TestProject;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,9 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus; import org.springframework.http.MediaType;
 
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 public class MainController {
@@ -31,70 +33,76 @@ public class MainController {
     }
     
     @GetMapping(value="/members")
-    public ResponseEntity<List<Member>> mainss() throws Exception {
+    public ResponseEntity<Map<String, Object>> mainss() throws Exception {
     	List<Member> mem =repo.findAll();
-    	
-        return new ResponseEntity<List<Member>>(mem, HttpStatus.OK);
-    }
-    
-    @GetMapping(value="/mem") 
-    public ResponseEntity<List<Member>> getAllmembers() {
-    	List<Member> member = ser.getMemberList(); 
-    	return new ResponseEntity<List<Member>>(member, HttpStatus.OK); 
-    }
-    
-    //pk로 검색
-    @GetMapping(value="/memno") 
-    public ResponseEntity<Optional<Member>> getnomembers(@RequestParam(value="no") int no) {
-    	Optional<Member> member = repo.findById(no); 
-    	return new ResponseEntity<Optional<Member>>(member, HttpStatus.OK); 
-    }
-    
-    //mem_pw 로 검색
-    @GetMapping(value="/mempw") 
-    public ResponseEntity<Optional<Member>> getpwmembers(@RequestParam(value="pw") String pw) {
-    	Optional<Member> member = repo.findByPw(pw); 
-    	return new ResponseEntity<Optional<Member>>(member, HttpStatus.OK); 
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	map.put("data", mem);
+    	return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
     }
     
     //mem_id 로 검색
-    @GetMapping(value="/memid") 
-    public ResponseEntity<Optional<Member>> getidmembers(@RequestParam(value="id") String id) {
+    @GetMapping(value="/members/{id}") 
+    public ResponseEntity<Optional<Member>> getidmembers(@PathVariable(value="id") String id) {
     	Optional<Member> member = repo.findById(id); 
-    	return new ResponseEntity<Optional<Member>>(member, HttpStatus.OK); 
+    	if(member.isPresent()){
+    		return new ResponseEntity<Optional<Member>>(member, HttpStatus.OK);
+    	}else {
+    		return new ResponseEntity<Optional<Member>>(member, HttpStatus.NOT_FOUND);
+    	}
+    	
     }
     
     @PostMapping(value="/members")
-    public ResponseEntity<Member> insertmembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) {
-    	Member member =  Member.builder().id(id).pw(pw).build();
-    	repo.save(member);
-    	
-    	return new ResponseEntity<Member>(member, HttpStatus.OK); 
+    public ResponseEntity<Map<String, Object>> insertmembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception {
+    	Map<String, Object> map = new HashMap<String, Object>();
+    	Optional<Member> check = repo.findById(id);
+    	if(check.isPresent()){
+    		throw new MyErrors.AlreadyExistException("이미 등록된 사용자");
+    	}else {
+    		Member member =  Member.builder().id(id).pw(pw).build();
+    		repo.save(member);
+    		map.put("message", "회원 정보가 등록되었습니다.");
+    		map.put("status", "success");
+    	//	throw new MyErrors.CreatedException("등록성공~!");
+    		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CREATED);
+    	}
     }
     
     @PatchMapping(value="/members")
-    public ResponseEntity<Optional<Member>> updatemembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) {
-
+    public ResponseEntity<Map<String, Object>> updatemembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception{
+    	Map<String, Object> map = new HashMap<String, Object>();
     	Optional<Member> mem = repo.findById(id);
-    	Member member1 = mem.get();
-    	mem.ifPresent(a -> {
+    	if(mem.isPresent()){
+    		Member member1 = mem.get();
     		Member member =  Member.builder().no(member1.no).id(id).pw(pw).build();
         	repo.save(member);
-    	});
-    	
-    	return new ResponseEntity<Optional<Member>>(mem, HttpStatus.OK); 
+        	map.put("message", "회원 정보가 수정되었습니다.");
+    		map.put("status", "success");
+    		throw new MyErrors.OkException("수정성공~!");
+    		//return new ResponseEntity<Map<String, Object>>(map, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}else {
+    		throw new MyErrors.ResourceNotFoundException("수정 실패");
+    	}
     }
     
     @DeleteMapping(value="/members")
-    public ResponseEntity<Optional<Member>> deletemembers(@RequestParam(value="id") String id) {
-
+    public ResponseEntity<Map<String, Object>> deletemembers(@RequestParam(value="id") String id) throws Exception{
+    	Map<String, Object> map = new HashMap<String, Object>();
     	Optional<Member> mem = repo.findById(id);
-    	Member member1 = mem.get();
-    	mem.ifPresent(a -> {
-        	repo.delete(member1);
-    	});
+    	if(mem.isPresent()){
+    		Member member1 = mem.get();
+    		repo.delete(member1);
+        	map.put("message", "회원 정보가 삭제되었습니다.");
+    		map.put("status", "success");
+    		//return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
+    		throw new MyErrors.OkException("삭제성공~!");
+    	}else {
+    		map.put("message", "회원 정보 삭제를 실패했습니다.");
+    		map.put("status", "fail");
+    		//return new ResponseEntity<Map<String, Object>>(map, HttpStatus.NOT_FOUND);
+    		throw new MyErrors.ResourceNotFoundException("삭제 실패");
+    	}
     	
-    	return new ResponseEntity<Optional<Member>>(mem, HttpStatus.OK); 
     }
     
 }
