@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.TestProject.UserDTO.ResponseDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
@@ -42,44 +44,36 @@ public class MainController {
     
     //mem_id 로 검색
     @GetMapping(value="/members/{id}") 
-    public ResponseEntity<Optional<Member>> getidmembers(@PathVariable(value="id") String id) {
-    	Optional<Member> member = repo.findById(id); 
-    	if(member.isPresent()){
-    		return new ResponseEntity<Optional<Member>>(member, HttpStatus.OK);
+    public ResponseDTO getidmembers(@PathVariable(value="id") String id) throws Exception {
+    	Optional<Member> mem = repo.findById(id); 
+    	if(mem.isPresent()){
+    		Member member =  Member.builder().id(mem.get().getId()).pw(mem.get().getPw()).build();
+    		return new ResponseDTO(200, "회원 정보 조회", member);
     	}else {
-    		return new ResponseEntity<Optional<Member>>(member, HttpStatus.NOT_FOUND);
+    		throw new MyErrors.ResourceNotFoundException("회원 정보를 찾을 수 없습니다.");
     	}
     	
     }
     
     @PostMapping(value="/members")
-    public ResponseEntity<Map<String, Object>> insertmembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception {
-    	Map<String, Object> map = new HashMap<String, Object>();
+    public ResponseDTO responseDinsertmembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception {
     	Optional<Member> check = repo.findById(id);
     	if(check.isPresent()){
     		throw new MyErrors.AlreadyExistException("이미 등록된 사용자");
     	}else {
     		Member member =  Member.builder().id(id).pw(pw).build();
     		repo.save(member);
-    		map.put("message", "회원 정보가 등록되었습니다.");
-    		map.put("status", "success");
-    	//	throw new MyErrors.CreatedException("등록성공~!");
-    		return new ResponseEntity<Map<String, Object>>(map, HttpStatus.CREATED);
+    		return new ResponseDTO(201, "회원 정보가 등록되었습니다.", member);
     	}
     }
     
     @PatchMapping(value="/members")
-    public ResponseEntity<Map<String, Object>> updatemembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception{
-    	Map<String, Object> map = new HashMap<String, Object>();
+    public ResponseDTO updatemembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception{
     	Optional<Member> mem = repo.findById(id);
     	if(mem.isPresent()){
-    		Member member1 = mem.get();
-    		Member member =  Member.builder().no(member1.no).id(id).pw(pw).build();
+    		Member member =  Member.builder().no(mem.get().no).id(id).pw(pw).build();
         	repo.save(member);
-        	map.put("message", "회원 정보가 수정되었습니다.");
-    		map.put("status", "success");
-    		throw new MyErrors.OkException("수정성공~!");
-    		//return new ResponseEntity<Map<String, Object>>(map, HttpStatus.INTERNAL_SERVER_ERROR);
+    		return new ResponseDTO(200, "회원 정보가 수정되었습니다.", member);
     	}else {
     		throw new MyErrors.ResourceNotFoundException("수정 실패");
     	}
@@ -87,19 +81,12 @@ public class MainController {
     
     @DeleteMapping(value="/members")
     public ResponseEntity<Map<String, Object>> deletemembers(@RequestParam(value="id") String id) throws Exception{
-    	Map<String, Object> map = new HashMap<String, Object>();
     	Optional<Member> mem = repo.findById(id);
     	if(mem.isPresent()){
-    		Member member1 = mem.get();
-    		repo.delete(member1);
-        	map.put("message", "회원 정보가 삭제되었습니다.");
-    		map.put("status", "success");
+    		repo.delete(mem.get());
     		//return new ResponseEntity<Map<String, Object>>(map, HttpStatus.OK);
     		throw new MyErrors.OkException("삭제성공~!");
     	}else {
-    		map.put("message", "회원 정보 삭제를 실패했습니다.");
-    		map.put("status", "fail");
-    		//return new ResponseEntity<Map<String, Object>>(map, HttpStatus.NOT_FOUND);
     		throw new MyErrors.ResourceNotFoundException("삭제 실패");
     	}
     	
