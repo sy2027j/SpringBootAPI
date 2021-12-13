@@ -8,18 +8,27 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserDTO {
+public class MemberDTO {
 
-	private int no;
+	private Long no;
 	private String id;
 	private String pw;
 	
-	public UserDTO(Member member) {
-		this.no=member.no;
-		this.id=member.id;
-		this.pw=member.pw;
+	public MemberDTO(Long no, String id, String pw) {
+		super();
+		this.no = no;
+		this.id = id;
+		this.pw = pw;
 	}
-	
+
+	public Member toEntity() {
+		return Member.builder()
+				.no(no)
+				.id(id)
+				.pw(pw)
+				.build();
+	}
+
 	@Getter
 	@AllArgsConstructor
 	public static class ResponseDTO {
@@ -41,6 +50,5 @@ public class UserDTO {
 	public static class ResponseDTO3 {
 		private int statusCode;
 		private String message;
-	}
-	
+	}	
 }

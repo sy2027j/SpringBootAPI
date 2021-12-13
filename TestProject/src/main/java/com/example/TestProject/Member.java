@@ -23,7 +23,7 @@ public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mem_no")
-	public int no;
+	public Long no;
 	
 	@Column(name="mem_id")
 	public String id;

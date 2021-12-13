@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.TestProject.UserDTO.ResponseDTO;
-import com.example.TestProject.UserDTO.ResponseDTO2;
-import com.example.TestProject.UserDTO.ResponseDTO3;
+import com.example.TestProject.MemberDTO.ResponseDTO;
+import com.example.TestProject.MemberDTO.ResponseDTO2;
+import com.example.TestProject.MemberDTO.ResponseDTO3;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -38,17 +38,18 @@ public class MainController {
     }
     
     @PostMapping(value="/members")
-    public ResponseDTO insertmembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception {
-    	return ser.InsertMember(id, pw);
+    public ResponseDTO insertmembers(MemberDTO dto) throws Exception {
+    	return ser.InsertMember(dto);
     }
     
-    @PatchMapping(value="/members")
-    public ResponseDTO updatemembers(@RequestParam(value="id") String id, @RequestParam(value="pw") String pw) throws Exception{
-    	return ser.UpdateMember(id, pw);
+    @PatchMapping(value="/members/{id}")
+    public ResponseDTO updatemembers(@PathVariable(value="id") String id, MemberDTO dto) throws Exception{
+    	dto.setId(id);
+    	return ser.UpdateMember(dto);
     }
     
     @DeleteMapping(value="/members")
-    public ResponseDTO3 deletemembers(@RequestParam(value="id") String id) throws Exception{
+    public ResponseDTO3 deletemembers(@PathVariable(value="id") String id) throws Exception{
     	return ser.DeleteMember(id);
     }
     
