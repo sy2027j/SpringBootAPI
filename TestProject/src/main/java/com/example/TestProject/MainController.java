@@ -1,56 +1,65 @@
 package com.example.TestProject;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.TestProject.MemberDTO.ResponseDTO;
 import com.example.TestProject.MemberDTO.ResponseDTO2;
 import com.example.TestProject.MemberDTO.ResponseDTO3;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
 
 @RestController
+@RequiredArgsConstructor //의존성 주입 생성자 @Autowired 보다 좋대 
+
 public class MainController {
 	
-	@Autowired
-	private MemberListService ser;
+	private final MemberListService ser;
 	
-    @RequestMapping(value="/")
+	//@Responsebody 어노테이션을 사용하면 http요청 body를 자바 객체로 전달받을 수 있다.
+    //@Valid 데이터 유효성 검사하는 어노테이션
+	@RequestMapping(value="/")
     public String main() throws Exception {
         return "index";
     }
-    
+
+    //전체 회원 목록 조회
     @GetMapping(value="/members")
     public ResponseDTO2 mainss() throws Exception {
     	return ser.getMemberList();
     }
-    
-    //id 로 검색
+
+    //id로 회원 조회하기
     @GetMapping(value="/members/{id}") 
-    public ResponseDTO getidmembers(@PathVariable(value="id") String id) throws Exception {
-    	return ser.getMemberById(id);
+    public ResponseEntity<?> getIdMembers(@PathVariable String id) throws Exception {
+    	MemberDTO member = ser.getMemberById(id);
+    	return ResponseEntity.ok().body(new MemberResponse(member));
     }
-    
+
+    //회원 가입하기
     @PostMapping(value="/members")
-    public ResponseDTO insertmembers(MemberDTO dto) throws Exception {
-    	return ser.InsertMember(dto);
+    public ResponseEntity<?> insertMembers(MemberDTO dto) throws Exception {
+    	MemberDTO newMem = ser.InsertMember(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MemberResponse(newMem));
     }
-    
+
+    //회원 정보 수정하기
     @PatchMapping(value="/members/{id}")
-    public ResponseDTO updatemembers(@PathVariable(value="id") String id, MemberDTO dto) throws Exception{
+    public ResponseEntity<?> updateMembers(@PathVariable(value="id") String id, MemberDTO dto) throws Exception{
     	dto.setId(id);
-    	return ser.UpdateMember(dto);
+    	return ResponseEntity.ok().body(new MemberResponse(ser.UpdateMember(dto)));
     }
-    
-    @DeleteMapping(value="/members")
-    public ResponseDTO3 deletemembers(@PathVariable(value="id") String id) throws Exception{
-    	return ser.DeleteMember(id);
+
+    //회원 탈퇴하기
+    @DeleteMapping(value="/members/{id}")
+    public ResponseEntity<?> deleteMembers(@PathVariable(value="id") String id) throws Exception {
+        if(ser.DeleteMember(id)){
+            return ResponseEntity.ok().build();
+        }else{
+            throw new MyErrors.ResourceNotFoundException("회원 정보를 찾을 수 없습니다.");
+        }
     }
-    
 }

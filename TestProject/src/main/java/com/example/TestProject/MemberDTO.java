@@ -3,6 +3,7 @@ package com.example.TestProject;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ public class MemberDTO {
 	private String id;
 	private String pw;
 	
+	@Builder
 	public MemberDTO(Long no, String id, String pw) {
 		super();
 		this.no = no;

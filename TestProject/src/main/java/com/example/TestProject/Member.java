@@ -23,12 +23,16 @@ public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mem_no")
-	public Long no;
+	private Long no;
 	
 	@Column(name="mem_id")
-	public String id;
+	private String id;
 	
 	@Column(name="mem_pw")
-	public String pw;
+	private String pw;
+	
+	public MemberDTO getMember() {
+		return MemberDTO.builder().id(getId()).no(no).pw(pw).build();
+	}
 
 }
