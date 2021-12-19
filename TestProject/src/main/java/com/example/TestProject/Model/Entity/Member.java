@@ -1,4 +1,4 @@
-package com.example.TestProject.Entity;
+package com.example.TestProject.Model.Entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -7,7 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import com.example.TestProject.Model.MemberDTO;
+import com.example.TestProject.Model.Dto.MemberDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Table(name="tbmember")
-public class Member {
+public class Member extends BaseEntity{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,8 @@ public class Member {
 	
 	@Column(name="mem_pw")
 	private String pw;
-	
+
+	@Override
 	public MemberDTO getMember() {
 		return MemberDTO.builder().id(getId()).no(no).pw(pw).build();
 	}

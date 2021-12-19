@@ -14,7 +14,7 @@ public class CommonResponse<T> {
 
 	public CommonResponse(T data, String message) {
 		this.data=data;
-		if(data instanceof List) {
+		if(data instanceof List) {  // data 를 List 형식으로 형변환이 가능
 			this.count=((List<?>)data).size();
 		}else {
 			this.count=1;

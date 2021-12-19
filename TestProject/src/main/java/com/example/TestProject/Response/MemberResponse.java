@@ -1,14 +1,13 @@
 package com.example.TestProject.Response;
 
-import com.example.TestProject.Entity.Member;
-import com.example.TestProject.Model.MemberDTO;
+import com.example.TestProject.Model.Dto.MemberDTO;
 
 import java.util.List;
 
 public class MemberResponse{
 
 	public static class MemberListResponse extends CommonResponse<List>{
-		public MemberListResponse(List<Member> member, String message){
+		public MemberListResponse(List<MemberDTO> member, String message){
 			super(member,message);
 		}
 	}

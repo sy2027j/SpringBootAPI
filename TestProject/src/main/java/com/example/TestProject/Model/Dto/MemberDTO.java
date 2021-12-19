@@ -1,6 +1,5 @@
-package com.example.TestProject.Model;
+package com.example.TestProject.Model.Dto;
 
-import com.example.TestProject.Entity.Member;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +11,7 @@ public class MemberDTO {
 	private Long no;
 	private String id;
 	private String pw;
-	
+
 	@Builder
 	public MemberDTO(Long no, String id, String pw) {
 		super();
@@ -21,11 +20,4 @@ public class MemberDTO {
 		this.pw = pw;
 	}
 
-	public Member toEntity() {
-		return Member.builder()
-				.no(no)
-				.id(id)
-				.pw(pw)
-				.build();
-	}
 }
