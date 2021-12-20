@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.example.TestProject.Model.Dto.MemberDTO;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +29,8 @@ public class Member extends BaseEntity{
 	
 	@Column(name="mem_id")
 	private String id;
-	
+
+	@JsonIgnore
 	@Column(name="mem_pw")
 	private String pw;
 

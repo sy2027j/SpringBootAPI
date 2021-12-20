@@ -1,5 +1,6 @@
 package com.example.TestProject.Model.Dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +11,8 @@ public class MemberDTO {
 
 	private Long no;
 	private String id;
+
+	@JsonIgnore
 	private String pw;
 
 	@Builder
